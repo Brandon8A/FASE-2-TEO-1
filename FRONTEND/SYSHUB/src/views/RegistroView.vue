@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import axios from 'axios'
+
 const router = useRouter()
 
 const form = ref({
@@ -11,11 +13,20 @@ const form = ref({
   password: ''
 })
 
-const handleRegister = () => {
-  console.log('Usuario registrado:', form.value)
+const handleRegister = async () => {
+  try {
+    console.log('Datos del formulario: ')
+    console.log(form.value)
+    const response = await axios.post('http://localhost:3000/auth/register', form.value)
 
-  // Aquí luego conectas con NestJS
-  router.push('/login')
+    console.log('Respuesta backend:', response.data)
+
+    // Redirigir después de registrar
+    router.push('/login')
+
+  } catch (error) {
+    console.error('Error al registrar:', error.response?.data || error.message)
+  }
 }
 </script>
 
