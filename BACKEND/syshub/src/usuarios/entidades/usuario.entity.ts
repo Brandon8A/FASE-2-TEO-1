@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Rol } from "./rol.entity";
 
-@Entity('usuario')
+@Entity('USUARIO')
 export class Usuario {
     
     @PrimaryColumn({type: 'varchar', length: 75})

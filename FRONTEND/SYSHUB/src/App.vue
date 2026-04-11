@@ -16,11 +16,11 @@ const isStudent = computed(() => {
   <!--
   <DashboardView />
   
-  <HomeView />
   
   <LoginView />
   
   <RegistroView/>
+  <HomeView />
   -->
   <router-view />
 </template>

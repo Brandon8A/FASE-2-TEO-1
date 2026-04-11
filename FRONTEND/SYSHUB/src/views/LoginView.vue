@@ -1,13 +1,41 @@
 <script setup>
+import router from '@/router'
+import axios from 'axios'
 import { ref } from 'vue'
 
 // Estados
-const email = ref('')
-const password = ref('')
+const correo = ref('')
+const contraseña = ref('')
 
-// Acción login (luego conectas a backend)
-const handleLogin = () => {
-  console.log("Login:", email.value, password.value)
+// Acción login 
+const handleLogin = async() => {
+  
+  console.log("Login:", correo.value, contraseña.value)
+  
+
+  try {
+
+    const response = await axios.post('http://localhost:3000/auth/login', {
+      correo: correo.value,
+      contraseña: contraseña.value
+    })
+
+    console.log('Login ok: ', response.data)
+
+    const usuario = response.data.usuario
+
+    localStorage.setItem('user', JSON.stringify(usuario))
+
+    //Redireccionar por rol
+    if (usuario.rol === 3) {
+      router.push('/homeAdmin')
+    } else {
+      router.push('/')
+    }
+
+  } catch (error) {
+    console.error('Error login: ', error.response?.data || error.message)
+  }
 }
 </script>
 
@@ -41,7 +69,7 @@ const handleLogin = () => {
               </label>
 
               <input
-                v-model="email"
+                v-model="correo"
                 type="email"
                 placeholder="ejemplo202700000@cunoc.edu.gt"
                 class="w-full bg-surface-container-highest rounded-lg py-4 px-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-surface-tint transition-all outline-none"
@@ -62,7 +90,7 @@ const handleLogin = () => {
               </div>
 
               <input
-                v-model="password"
+                v-model="contraseña"
                 type="password"
                 placeholder="contraseña"
                 class="w-full bg-surface-container-highest rounded-lg py-4 px-4 text-on-surface placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-surface-tint transition-all outline-none"
@@ -86,7 +114,8 @@ const handleLogin = () => {
 
           <p class="text-on-surface-variant font-medium">
             ¿No tienes una cuenta?
-            <a href="#" class="text-surface-tint font-bold hover:underline ml-1">
+            <a href="/registro" 
+            class="text-surface-tint font-bold hover:underline ml-1">
               Regístrate
             </a>
           </p>

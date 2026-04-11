@@ -1,16 +1,10 @@
 import { IsEmail, IsNotEmpty } from "class-validator";
 
-export class CrearUsuarioDto {
-    
-    @IsNotEmpty()
-    rol!: string;
-    
-    @IsNotEmpty()
-    nombre!: string;
-    
+export class LoginDto {
+
     @IsEmail()
     correo!: string;
     
     @IsNotEmpty()
     contraseña!: string;
-} 
+}

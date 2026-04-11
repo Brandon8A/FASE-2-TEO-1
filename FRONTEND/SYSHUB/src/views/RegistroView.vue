@@ -7,10 +7,10 @@ import axios from 'axios'
 const router = useRouter()
 
 const form = ref({
-  role: 'estudiante',
-  fullname: '',
-  email: '',
-  password: ''
+  rol: 'estudiante',
+  nombre: '',
+  correo: '',
+  contraseña: ''
 })
 
 const handleRegister = async () => {
@@ -61,7 +61,7 @@ const handleRegister = async () => {
 
                 <!-- ESTUDIANTE -->
                 <label class="relative cursor-pointer group">
-                  <input v-model="form.role" value="estudiante" type="radio" class="peer sr-only" />
+                  <input v-model="form.rol" :value=1 type="radio" class="peer sr-only" />
 
                   <div class="p-6 bg-surface-container-low rounded-2xl border-2 border-transparent 
                               peer-checked:border-surface-tint peer-checked:bg-white transition-all hover:bg-surface-container">
@@ -79,7 +79,7 @@ const handleRegister = async () => {
 
                 <!-- AUXILIAR -->
                 <label class="relative cursor-pointer group">
-                  <input v-model="form.role" value="auxiliar" type="radio" class="peer sr-only" />
+                  <input v-model="form.rol" :value=2 type="radio" class="peer sr-only" />
 
                   <div class="p-6 bg-surface-container-low rounded-2xl border-2 border-transparent 
                               peer-checked:border-surface-tint peer-checked:bg-white transition-all hover:bg-surface-container">
@@ -97,7 +97,7 @@ const handleRegister = async () => {
 
                 <!-- ADMIN -->
                 <label class="relative cursor-pointer group">
-                  <input v-model="form.role" value="administrador" type="radio" class="peer sr-only" />
+                  <input v-model="form.rol" :value=3 type="radio" class="peer sr-only" />
 
                   <div class="p-6 bg-surface-container-low rounded-2xl border-2 border-transparent 
                               peer-checked:border-surface-tint peer-checked:bg-white transition-all hover:bg-surface-container">
@@ -124,7 +124,7 @@ const handleRegister = async () => {
                   Nombre Completo
                 </label>
                 <input
-                  v-model="form.fullname"
+                  v-model="form.nombre"
                   type="text"
                   class="w-full px-6 py-4 bg-surface-container-highest rounded-xl focus:ring-2 focus:ring-surface-tint"
                   placeholder="Nombre"
@@ -136,7 +136,7 @@ const handleRegister = async () => {
                   Email
                 </label>
                 <input
-                  v-model="form.email"
+                  v-model="form.correo"
                   type="email"
                   class="w-full px-6 py-4 bg-surface-container-highest rounded-xl focus:ring-2 focus:ring-surface-tint"
                   placeholder="202700000@cunoc.edu.gt"
@@ -148,7 +148,7 @@ const handleRegister = async () => {
                   Contraseña
                 </label>
                 <input
-                  v-model="form.password"
+                  v-model="form.contraseña"
                   type="password"
                   class="w-full px-6 py-4 bg-surface-container-highest rounded-xl focus:ring-2 focus:ring-surface-tint"
                   placeholder="Contraseña"
@@ -171,8 +171,7 @@ const handleRegister = async () => {
                 ¿Ya tienes una cuenta?
                 <a
                   @click.prevent="router.push('/login')"
-                  class="text-secondary font-bold hover:text-surface-tint cursor-pointer ml-1"
-                >
+                  class="text-secondary font-bold hover:text-surface-tint cursor-pointer ml-1">
                   Iniciar sesión
                 </a>
               </div>

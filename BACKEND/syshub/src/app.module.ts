@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { Usuario } from './usuarios/entidades/usuario.entity';
 import { Rol } from './usuarios/entidades/rol.entity';
-import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,10 +19,12 @@ import { AuthController } from './auth/auth.controller';
       database: 'SYSHUB',
       entities: [Usuario, Rol],
       synchronize: true,
+      logging: true,
     }),
-    UsuariosModule
+    UsuariosModule,
+    AuthModule
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

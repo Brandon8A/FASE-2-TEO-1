@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import DashboardView from '../views/DashboardView.vue'
-import LoginView from '../views/LoginView.vue'
-import HomeView from '../views/HomeView.vue'
-import RegistroView from '../views/RegistroView.vue'
+//import DashboardView from '../views/DashboardView.vue'
+//import LoginView from '../views/LoginView.vue'
+//import HomeView from '../views/HomeView.vue'
+//import RegistroView from '../views/RegistroView.vue'
 
 //Funcion para saber si esta logueado
 const estaAutenticado = () => {
@@ -14,17 +14,17 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: () => import('../views/HomeView.vue')
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginView
+    component: () => import('../views/LoginView.vue')
   },
   {
     path: '/registro',
     name: 'registro',
-    component: RegistroView
+    component: () => import('../views/RegistroView.vue')
   }
 ]
 

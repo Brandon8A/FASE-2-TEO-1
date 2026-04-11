@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { computed } from 'vue';
+
+const isStudent = computed(() => user.value?.rol === 1);
+const isAuxiliar = computed(() => user.value?.rol === 2);
 
 const router = useRouter();
 
@@ -19,18 +23,6 @@ onMounted(() => {
 
   fetchPosts()
 })
-
-// LOGIN SIMULADO
-const login = () => {
-  const fakeUser = {
-    name: "Brandon Ochoa",
-    role: "Estudiante",
-    avatar: "https://i.pravatar.cc/100"
-  }
-
-  user.value = fakeUser
-  localStorage.setItem('user', JSON.stringify(fakeUser))
-}
 
 // LOGOUT
 const logout = () => {
@@ -109,8 +101,8 @@ const handleScroll = (e) => {
   <div v-else class="flex items-center gap-3">
 
     <div class="text-right hidden sm:block">
-      <p class="text-xs font-bold">{{ user.name }}</p>
-      <p class="text-[10px] text-secondary uppercase">{{ user.role }}</p>
+      <p class="text-xs font-bold">{{ user.correo }}</p>
+      <p class="text-[10px] text-secondary uppercase">{{ user.rol }}</p>
     </div>
 
     <img
