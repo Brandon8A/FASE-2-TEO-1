@@ -26,8 +26,9 @@ const handleLogin = async() => {
 
     localStorage.setItem('user', JSON.stringify(usuario))
 
+    console.log('Rol', usuario.rol)
     //Redireccionar por rol
-    if (usuario.rol === 3) {
+    if (Number(usuario.rol) === 3) {
       router.push('/homeAdmin')
     } else {
       router.push('/')

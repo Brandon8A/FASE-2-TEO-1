@@ -195,21 +195,35 @@ const handleScroll = (e) => {
         <!-- PANEL DERECHO -->
         <div class="xl:col-span-4 h-full flex items-start">
           <div
-            v-if="isStudent"
-            class="bg-secondary text-white p-6 rounded-xl w-full sticky top-6"
-          >
-            <h3 class="text-xl font-bold mb-4">
-              Laboratorio Académico
-            </h3>
+  v-if="user"
+  class="bg-secondary text-white p-6 rounded-xl w-full sticky top-6 space-y-3"
+>
+  <h3 class="text-xl font-bold mb-4">
+    Laboratorio Académico
+  </h3>
 
-            <button class="w-full bg-pink-500 py-2 rounded mb-2 hover:scale-105 transition">
-              Crear Publicación
-            </button>
+  <!-- BOTÓN GENERAL -->
+  <button class="w-full bg-pink-500 py-2 rounded hover:scale-105 transition">
+    Crear Publicación
+  </button>
 
-            <button class="w-full border py-2 rounded hover:bg-white/20 transition">
-              Hacer Pregunta
-            </button>
-          </div>
+  <!-- SOLO ESTUDIANTE -->
+  <button
+    v-if="isStudent"
+    class="w-full border py-2 rounded hover:bg-white/20 transition"
+  >
+    Hacer Pregunta
+  </button>
+
+  <!-- 🔥 SOLO AUXILIAR -->
+  <button
+    v-if="isAuxiliar"
+    class="w-full bg-[#3a5f94] py-2 rounded hover:scale-105 transition"
+  >
+    Subir Material de Apoyo
+  </button>
+
+</div>
         </div>
 
       </main>
