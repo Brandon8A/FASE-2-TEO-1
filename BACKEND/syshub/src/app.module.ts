@@ -7,6 +7,9 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { Usuario } from './usuarios/entidades/usuario.entity';
 import { Rol } from './usuarios/entidades/rol.entity';
 import { AuthModule } from './auth/auth.module';
+import { Contenido } from './usuarios/entidades/contenido/contenido';
+import { TipoContenido } from './usuarios/entidades/tipo-contenido/tipo-contenido';
+import { ContenidoModule } from './contenido/contenido.module';
 
 @Module({
   imports: [
@@ -17,12 +20,13 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol],
+      entities: [Usuario, Rol, Contenido, TipoContenido],
       synchronize: true,
       logging: true,
     }),
     UsuariosModule,
-    AuthModule
+    AuthModule,
+    ContenidoModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -10,9 +10,8 @@ const contraseña = ref('')
 // Acción login 
 const handleLogin = async() => {
   
-  console.log("Login:", correo.value, contraseña.value)
+ // console.log("Login:", correo.value, contraseña.value)
   
-
   try {
 
     const response = await axios.post('http://localhost:3000/auth/login', {
@@ -20,13 +19,15 @@ const handleLogin = async() => {
       contraseña: contraseña.value
     })
 
-    console.log('Login ok: ', response.data)
+    //console.log('Login ok: ', response.data)
 
     const usuario = response.data.usuario
 
-    localStorage.setItem('user', JSON.stringify(usuario))
+    console.log('Usuario logueado:', usuario)
 
-    console.log('Rol', usuario.rol)
+    localStorage.setItem('usuario', JSON.stringify(usuario))
+
+    //console.log('Rol', usuario.rol)
     //Redireccionar por rol
     if (Number(usuario.rol) === 3) {
       router.push('/homeAdmin')

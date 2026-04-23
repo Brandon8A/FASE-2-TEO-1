@@ -18,7 +18,7 @@ const page = ref(1)
 
 // Cargar sesión guardada
 onMounted(() => {
-  const savedUser = localStorage.getItem('user')
+  const savedUser = localStorage.getItem('usuario')
   if (savedUser) user.value = JSON.parse(savedUser)
 
   fetchPosts()
@@ -27,7 +27,7 @@ onMounted(() => {
 // LOGOUT
 const logout = () => {
   user.value = null
-  localStorage.removeItem('user')
+  localStorage.removeItem('usuario')
 }
 
 // Simulación API

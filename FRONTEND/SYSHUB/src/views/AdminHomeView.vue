@@ -6,36 +6,12 @@ import axios from 'axios'
 
 const usuarios = ref([])
 
-//Obtiene los usuarios una vez que se inicie la vista
-onMounted(() => {
-  obtenerUsuarios()
-})
+const usuarioActual = JSON.parse(localStorage.getItem('usuario'))
 
 //Metodo para cerrar sesión y redirigir a pagina principal
 const logout = () =>{
-  localStorage.removeItem('user')
+  localStorage.removeItem('usuario')
   router.push('/')
-}
-
-//METODO PARA OBTENER LOS USUARIOS REGISTRADOS EN EL SISTEMA
-const obtenerUsuarios = async () => {
-  try {
-    const response = await axios.get('http://localhost:3000/usuarios')//OBTENER USUARIOS DESDE CONTROLLADOR 'usuarios'
-
-    //console.log('Usuarios desde backend:', response.data)
-
-    //Mapear usuarios obtenidos
-    usuarios.value = response.data.map(u => ({
-      id: u.correo,
-      nombre: u.nombre,
-      correo: u.correo,
-      rol: u.rol?.nombre || 'Sin rol',
-      estado: u.suspendido ? 'Suspendido' : 'Activo'
-    }))
-
-  } catch (error) {
-    console.error('Error al obtener usuarios:', error.response?.data || error.message)
-  }
 }
 
 // MODAL
@@ -49,20 +25,6 @@ const form = ref({
   rol: 'Estudiante',
   estado: 'Activo'
 })
-
-// ABRIR CREAR
-const crearUsuario = () => {
-  isEditing.value = false
-  form.value = { nombre: '', correo: '', contraseña: '', rol: 'Estudiante', estado: 'Activo' }
-  showModal.value = true
-}
-
-// EDITAR
-const editar = (user) => {
-  isEditing.value = true
-  form.value = { ...user, contraseña: '' }
-  showModal.value = true
-}
 
 // EDITAR O GUARDAR NUEVO USUARIO POR ADMINISTRADOR
 const guardarUsuario = async () => {
@@ -132,37 +94,6 @@ const guardarUsuario = async () => {
     console.error('Error al guardar:', error.response?.data || error.message)
   }
 }
-
-// ELIMINAR USUARIO POR ADMINISTRADOR
-const eliminar = async (correo) => {
-  //CONFIRMAR ELIMINACION DE USUARIO
-  if (!confirm('¿Seguro que deseas eliminar este usuario?')) return
-
-  try {
-    await axios.patch(`http://localhost:3000/usuarios/${correo}/eliminar`)
-    usuarios.value = usuarios.value.filter(u => u.correo !== correo)
-  } catch (error) {
-    console.error('Error al eliminar:', error.response?.data || error.message)
-  }
-}
-
-// METODO PARA CAMBIAR EL ESTADO DEL USUARIO A activo | suspendido
-const toggleEstado = async (user) => {
-  try {
-    const nuevoEstado = user.estado === 'Activo'
-    console.log('Usuario: ',user.correo)
-
-    await axios.patch(`http://localhost:3000/usuarios/${user.correo}/suspender`, {
-      suspendido: nuevoEstado
-    })
-
-    // actualizar en tabla
-    user.estado = nuevoEstado ? 'Suspendido' : 'Activo'
-
-  } catch (error) {
-    console.error('Error al cambiar estado:', error.response?.data || error.message)
-  }
-}
 </script>
 
 <template>
@@ -173,7 +104,7 @@ const toggleEstado = async (user) => {
       <h1 class="text-2xl font-bold text-blue-700">SYSHUB</h1>
       <div class="flex items-center gap-4">
         <div class="text-right">
-          <p class="text-sm font-bold">Admin</p>
+          <p class="text-sm font-bold">{{ usuarioActual.correo }}</p>
         </div>
 
         <img class="w-10 h-10 rounded-full" src="https://i.pravatar.cc/100"/>
@@ -189,82 +120,35 @@ const toggleEstado = async (user) => {
     <div class="flex">
 
       <!-- SIDEBAR -->
-      <aside class="hidden lg:flex flex-col w-64 p-6 gap-6">
+      <aside class="hidden lg:flex flex-col w-64 p-6 gap-4">
 
-        <div class="flex items-center gap-3 font-bold text-pink-600">
+        <!-- USUARIOS -->
+        <router-link to="/homeAdmin/usuarios"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+          exact-active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">manage_accounts</span>
             Usuarios
-        </div>
+        </router-link>
 
-        <div class="flex items-center gap-3">
+        <!-- CONTENIDO -->
+        <router-link to="/homeAdmin/contenido"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+          exact-active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">account_tree</span>
             Contenido
-        </div>
+        </router-link>
 
-        <div class="flex items-center gap-3">
+        <router-link to="/admin/moderacion"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+          active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">gavel</span>
-            Moderación
-        </div>
-
+          Moderación
+        </router-link>
       </aside>
 
       <!-- MAIN -->
-      <main class="flex-1 p-6 space-y-6">
-
-        <h2 class="text-3xl font-bold">
-          Panel Administrador
-        </h2>
-
-        <!-- TABLA -->
-        <section class="bg-white p-6 rounded-xl shadow">
-
-          <div class="flex justify-between mb-4">
-            <h3 class="font-bold">Usuarios</h3>
-
-            <button @click="crearUsuario"
-              class="bg-pink-600 text-white px-4 py-2 rounded">
-              + Crear
-            </button>
-          </div>
-
-          <table class="w-full">
-            <thead>
-              <tr class="text-left text-sm text-gray-500">
-                <th>Nombre</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th class="text-right">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr v-for="user in usuarios" :key="user.correo" class="border-t">
-
-                <td>
-                  <p class="font-bold">{{ user.nombre }}</p>
-                  <p class="text-xs text-gray-500">{{ user.correo }}</p>
-                </td>
-
-                <td>{{ user.rol }}</td>
-
-                <td>
-                  <span :class="user.estado === 'Activo' ? 'text-green-600' : 'text-red-600'">
-                    {{ user.estado }}
-                  </span>
-                </td>
-
-                <td class="text-right space-x-2">
-                  <button @click="editar(user)">✏️</button>
-                  <button @click="toggleEstado(user)">⛔</button>
-                  <button @click="eliminar(user.correo)">🗑️</button>
-                </td>
-
-              </tr>
-            </tbody>
-          </table>
-
-        </section>
-
+      <main class="flex-1 p-6">
+        <router-view />
       </main>
     </div>
 
