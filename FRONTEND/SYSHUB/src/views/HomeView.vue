@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { computed } from 'vue';
+import axios from 'axios'
 
 const isStudent = computed(() => user.value?.rol === 1);
 const isAuxiliar = computed(() => user.value?.rol === 2);
@@ -24,28 +25,79 @@ onMounted(() => {
   fetchPosts()
 })
 
+// MOSTRAR MODAL PARA EL FORMULARIO DE CREAR PUBLICACION
+const showModal = ref(false)
+
+// FORMULARIO
+const descripcion = ref('')
+const archivo = ref(null)
+
+// SELECCIONAR ALGUN ARCHIVO
+const handleFile = (e) => {
+  archivo.value = e.target.files[0]
+}
+
+// ENVIAR PUBLICACIÓN
+const crearPublicacion = async () => {
+  try {
+    const formData = new FormData()
+
+    formData.append('descripcion', descripcion.value)
+    formData.append('usuario_publica_fk', user.value.correo)
+
+    //Condicional para verificar que si se haya seleccionado un archivo
+    if (archivo.value) {
+      formData.append('file', archivo.value)
+    }
+
+    console.log('Metodo crearPublicacion()')
+
+    const response = await axios.post(
+      'http://localhost:3000/publicacion',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    )
+
+    console.log('Publicación creada:', response.data)
+
+    // reset
+    descripcion.value = ''
+    archivo.value = null
+    showModal.value = false
+
+    //Actualiza el feed
+    await fetchPosts()
+
+  } catch (error) {
+    console.error('Error al crear publicación', error)
+  }
+}
+
 // LOGOUT
 const logout = () => {
   user.value = null
   localStorage.removeItem('usuario')
 }
 
-// Simulación API
 const fetchPosts = async () => {
   if (loading.value) return
 
   loading.value = true
 
-  await new Promise(resolve => setTimeout(resolve, 800))
+  try {
+    const response = await axios.get('http://localhost:3000/publicacion')
 
-  const newPosts = Array.from({ length: 5 }, (_, i) => ({
-    id: page.value * 10 + i,
-    title: `Post académico ${page.value * 10 + i}`,
-    content: "Contenido dinámico cargado automáticamente..."
-  }))
+    console.log('Publicaciones:', response.data)
 
-  posts.value.push(...newPosts)
-  page.value++
+    posts.value = response.data
+
+  } catch (error) {
+    console.error('Error al obtener publicaciones', error)
+  }
 
   loading.value = false
 }
@@ -148,7 +200,7 @@ const handleScroll = (e) => {
         <div v-if="user" class="mt-6">
           <button
             @click="logout"
-            class="w-full bg-red-500 text-white py-2 rounded-lg hover:scale-105 transition"
+            class="w-full bg-pink-500 text-white py-2 rounded-lg hover:scale-105 transition"
           >
             Cerrar sesión
           </button>
@@ -171,17 +223,36 @@ const handleScroll = (e) => {
 
           <!-- POSTS -->
           <transition-group name="fade" tag="div" class="space-y-6">
-            <div
-              v-for="post in posts"
-              :key="post.id"
-              class="bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300"
-            >
-              <h2 class="text-xl font-bold mb-2">
-                {{ post.title }}
-              </h2>
-              <p class="text-gray-600 text-sm">
-                {{ post.content }}
+            <div v-for="post in posts" :key="post.id_publicacion"
+              class="bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300">
+              <!-- USUARIO -->
+              <p class="text-sm font-bold text-[#3a5f94]">
+                {{ post.usuario?.correo }}
               </p>
+            
+              <!-- FECHA -->
+              <p class="text-xs text-gray-400 mb-2">
+                {{ new Date(post.fecha_publicacion).toLocaleString() }}
+              </p>
+            
+              <!-- DESCRIPCIÓN -->
+              <p class="text-gray-700 mb-3">
+                {{ post.descripcion }}
+              </p>
+            
+              <!-- MULTIMEDIA -->
+              <div v-if="post.multimedia">
+                <img
+                  :src="`http://localhost:3000/uploads/${post.multimedia}`"
+                  class="rounded-lg max-h-80 object-cover"
+                />
+              </div>
+            
+              <!-- LIKES -->
+              <p class="text-xs text-gray-500 mt-2">
+                ❤️ {{ post.likes }} likes
+              </p>
+            
             </div>
           </transition-group>
 
@@ -194,39 +265,66 @@ const handleScroll = (e) => {
 
         <!-- PANEL DERECHO -->
         <div class="xl:col-span-4 h-full flex items-start">
-          <div
-  v-if="user"
-  class="bg-secondary text-white p-6 rounded-xl w-full sticky top-6 space-y-3"
->
-  <h3 class="text-xl font-bold mb-4">
-    Laboratorio Académico
-  </h3>
+          <div v-if="user" class="bg-secondary text-white p-6 rounded-xl w-full sticky top-6 space-y-3">
+            <h3 class="text-xl font-bold mb-4">
+              Laboratorio Académico
+            </h3>
 
-  <!-- BOTÓN GENERAL -->
-  <button class="w-full bg-pink-500 py-2 rounded hover:scale-105 transition">
-    Crear Publicación
-  </button>
+            <!-- BOTÓN GENERAL -->
+            <button @click="showModal = true" class="w-full bg-pink-500 py-2 rounded hover:scale-105 transition">
+              Crear Publicación
+            </button>
 
-  <!-- SOLO ESTUDIANTE -->
-  <button
-    v-if="isStudent"
-    class="w-full border py-2 rounded hover:bg-white/20 transition"
-  >
-    Hacer Pregunta
-  </button>
+            <!-- SOLO ESTUDIANTE -->
+            <button v-if="isStudent" class="w-full border py-2 rounded hover:bg-white/20 transition">
+              Hacer Pregunta
+            </button>
 
-  <!-- 🔥 SOLO AUXILIAR -->
-  <button
-    v-if="isAuxiliar"
-    class="w-full bg-[#3a5f94] py-2 rounded hover:scale-105 transition"
-  >
-    Subir Material de Apoyo
-  </button>
+            <!-- SOLO AUXILIAR -->
+            <button v-if="isAuxiliar" class="w-full bg-[#3a5f94] py-2 rounded hover:scale-105 transition">
+              Subir Material de Apoyo
+            </button>
 
-</div>
+          </div>
         </div>
 
       </main>
+    </div>
+  </div>
+  <!-- MODAL -->
+  <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl w-[400px] space-y-4">
+      <h2 class="text-xl font-bold">Nueva Publicación</h2>
+      <!-- DESCRIPCIÓN -->
+      <textarea
+        v-model="descripcion"
+        placeholder="Escribe una descripción..."
+        class="w-full border p-2 rounded resize-none"
+      ></textarea>
+
+      <!-- ARCHIVO -->
+      <input
+        type="file"
+        @change="handleFile"
+        class="w-full"
+      />
+
+      <!-- BOTONES -->
+      <div class="flex justify-end gap-2">
+        <button 
+          @click="showModal = false"
+          class="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancelar
+        </button>
+
+        <button 
+          @click="crearPublicacion"
+          class="px-4 py-2 bg-pink-500 text-white rounded"
+        >
+          Publicar
+        </button>
+      </div>
     </div>
   </div>
 </template>

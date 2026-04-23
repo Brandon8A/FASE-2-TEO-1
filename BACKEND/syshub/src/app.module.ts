@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { Contenido } from './usuarios/entidades/contenido/contenido';
 import { TipoContenido } from './usuarios/entidades/tipo-contenido/tipo-contenido';
 import { ContenidoModule } from './contenido/contenido.module';
+import { PublicacionModule } from './publicacion/publicacion.module';
+import { Publicacion } from './publicacion/entidades/publicacion.entity';
 
 @Module({
   imports: [
@@ -20,13 +22,14 @@ import { ContenidoModule } from './contenido/contenido.module';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol, Contenido, TipoContenido],
+      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion],
       synchronize: true,
       logging: true,
     }),
     UsuariosModule,
     AuthModule,
-    ContenidoModule
+    ContenidoModule,
+    PublicacionModule
   ],
   controllers: [AppController],
   providers: [AppService],
