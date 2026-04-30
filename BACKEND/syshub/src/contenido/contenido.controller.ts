@@ -18,6 +18,7 @@ export class ContenidoController {
         return contenido
     }
 
+    //Metodo encargado de conectar con la creacion de contenido
     @Post('contenido')
     crear(@Body() data: CrearContenidoDto){
         return this.contenidoService.crearContenido(data);

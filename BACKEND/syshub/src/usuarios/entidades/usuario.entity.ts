@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { Rol } from "./rol.entity";
+import { Comentario } from "src/comentario/entidades/comentario.entity";
 
 @Entity('USUARIO')
 export class Usuario {
@@ -22,4 +23,7 @@ export class Usuario {
     @ManyToOne(() => Rol, rol => rol.usuarios)
     @JoinColumn({ name: 'rol'})
     rol!: Rol;
+
+    @OneToMany(() => Comentario, (comentario) => comentario.usuario)
+    comentarios?: Comentario[];
 }

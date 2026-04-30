@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { CrearUsuarioDto } from './dto/crear-usuario.dto/crear-usuario.dto';
 import { LoginDto } from './dto/login.dto/login.dto';
 
+//Controlador de autenticación
 @Controller('auth')
 export class AuthController {
     

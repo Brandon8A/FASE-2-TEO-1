@@ -12,6 +12,10 @@ import { TipoContenido } from './usuarios/entidades/tipo-contenido/tipo-contenid
 import { ContenidoModule } from './contenido/contenido.module';
 import { PublicacionModule } from './publicacion/publicacion.module';
 import { Publicacion } from './publicacion/entidades/publicacion.entity';
+import { LikesModule } from './likes/likes.module';
+import { Likes } from './likes/entidades/likes.entity';
+import { ComentarioModule } from './comentario/comentario.module';
+import { Comentario } from './comentario/entidades/comentario.entity';
 
 @Module({
   imports: [
@@ -22,14 +26,16 @@ import { Publicacion } from './publicacion/entidades/publicacion.entity';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion],
+      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario],
       synchronize: true,
       logging: true,
     }),
     UsuariosModule,
     AuthModule,
     ContenidoModule,
-    PublicacionModule
+    PublicacionModule,
+    LikesModule,
+    ComentarioModule
   ],
   controllers: [AppController],
   providers: [AppService],
