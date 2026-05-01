@@ -34,4 +34,10 @@ export class UsuariosController {
     ){
         return this.usuarioService.actualizar(correo, data)
     }
+
+    //Metodo get para obtener usuario solo con rol ESTUDIANTE
+    @Get('estudiantes')
+    obtenerEstudiantes(){
+        return this.usuarioService.obtenerEstudiantes();
+    }
 }

@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { ref, onMounted, computed, provide } from 'vue'
+import { ref, onMounted, computed, provide, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -28,9 +28,119 @@ const archivoPregunta = ref(null)
 const descripcion = ref('')
 const archivo = ref(null)
 
+const showDestacarModal = ref(false)
+// CAMPOS FORMULARIO
+const estudianteSeleccionado = ref('')
+const proyectoSeleccionado = ref('')
+// LISTA DE ESTUDIANTES
+const estudiantes = ref([])
+
+// LISTA DE PROYECTOS DEL ESTUDIANTE
+const proyectosEstudiante = ref([])
+
 // SELECCIONAR ALGUN ARCHIVO
 const handleFile = (e) => {
   archivo.value = e.target.files[0]
+}
+
+// OBTENER ESTUDIANTES
+const obtenerEstudiantes = async () => {
+  try {
+    const response = await axios.get('http://localhost:3000/usuarios/estudiantes')
+
+    estudiantes.value = response.data
+
+  } catch (error) {
+    console.error('Error al obtener estudiantes', error)
+  }
+}
+// OBTENER PROYECTOS DEL ESTUDIANTE
+const obtenerProyectosEstudiante = async (correo) => {
+
+  if (!correo) {
+    proyectosEstudiante.value = []
+    return
+  }
+
+  try {
+
+    const response = await axios.get(
+      `http://localhost:3000/proyecto/usuario/${correo}`
+    )
+
+    proyectosEstudiante.value = response.data
+
+  } catch (error) {
+    console.error('Error al obtener proyectos', error)
+  }
+}
+
+// WATCH PARA CAMBIAR ESTUDIANTE
+watch(estudianteSeleccionado, (nuevoCorreo) => {
+
+  proyectoSeleccionado.value = ''
+  obtenerProyectosEstudiante(nuevoCorreo)
+
+})
+
+// CREAR DESTACADO
+const destacarProyecto = async () => {
+
+  if (!proyectoSeleccionado.value) {
+    mostrarMensaje('Debes seleccionar un proyecto')
+    return
+  }
+
+  try {
+
+    const formData = new FormData()
+
+    formData.append('proyecto_fk', proyectoSeleccionado.value)
+    formData.append('usuario_auxiliar_fk', user.value.correo)
+
+    // ARCHIVO OPCIONAL
+    if (archivoAdjunto.value) {
+      formData.append('archivo', archivoAdjunto.value)
+    }
+
+    // VIDEO OPCIONAL
+    if (videoAdjunto.value) {
+      formData.append('video', videoAdjunto.value)
+    }
+
+    // ENLACE OPCIONAL
+    if (enlaceProyecto.value.trim()) {
+      formData.append('enlace', enlaceProyecto.value)
+    }
+
+    await axios.post(
+      'http://localhost:3000/destacar-proyecto',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    )
+
+    mostrarMensaje('Proyecto destacado correctamente')
+
+    // RESET
+    estudianteSeleccionado.value = ''
+    proyectoSeleccionado.value = ''
+    archivoAdjunto.value = null
+    videoAdjunto.value = null
+    enlaceProyecto.value = ''
+
+    proyectosEstudiante.value = []
+
+    showDestacarModal.value = false
+
+  } catch (error) {
+    console.error('Error al destacar proyecto', error)
+    mostrarMensaje('Error al destacar proyecto')
+  }
+
 }
 
 
@@ -41,6 +151,9 @@ onMounted(() => {
   if (savedUser) {
     user.value = JSON.parse(savedUser)
   }
+
+  // OBTENER ESTUDIANTES
+  obtenerEstudiantes()
 })
 
 // Logout
@@ -242,8 +355,10 @@ const mostrarMensaje = (texto) => {
             </button>
 
             <!-- SOLO AUXILIAR -->
-            <button v-if="isAuxiliar" class="w-full bg-[#3a5f94] py-2 rounded hover:scale-105 transition">
-              Subir Material de Apoyo
+            <!-- BOTÓN DESTACAR -->
+            <button v-if="isAuxiliar" @click="showDestacarModal = true"
+              class="w-full bg-[#3a5f94] py-2 rounded hover:scale-105 transition">
+              Destacar Proyecto
             </button>
 
           </div>
@@ -253,6 +368,7 @@ const mostrarMensaje = (texto) => {
       </main>
 
     </div>
+
 
     <!-- MODAL PUBLICACION-->
     <div v-if="showModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -278,6 +394,8 @@ const mostrarMensaje = (texto) => {
         </div>
       </div>
     </div>
+
+
     <!-- MODAL PREGUNTA -->
     <div v-if="showPreguntaModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded-xl w-[400px] space-y-4">
@@ -304,6 +422,121 @@ const mostrarMensaje = (texto) => {
     <!-- MENSAJE -->
     <div v-if="showMensaje" class="fixed bottom-5 right-5 bg-pink-500 text-white px-4 py-2 rounded">
       {{ mensaje }}
+    </div>
+
+  </div>
+
+
+  <!-- MODAL DESTACAR PROYECTO -->
+  <div v-if="showDestacarModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+    <div class="bg-white p-6 rounded-2xl w-[500px] space-y-5 shadow-2xl">
+
+      <!-- TITULO -->
+      <div>
+        <h2 class="text-2xl font-bold text-[#3a5f94]">
+          Destacar Proyecto
+        </h2>
+
+        <p class="text-sm text-gray-500 mt-1">
+          Selecciona un estudiante y uno de sus proyectos.
+        </p>
+      </div>
+
+      <!-- ESTUDIANTE -->
+      <div class="space-y-2">
+
+        <label class="text-sm font-semibold text-gray-700">
+          Estudiante
+        </label>
+
+        <select v-model="estudianteSeleccionado"
+          class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400">
+
+          <option value="">
+            Selecciona un estudiante
+          </option>
+
+          <option v-for="estudiante in estudiantes" :key="estudiante.correo" :value="estudiante.correo">
+            {{ estudiante.nombre }} - {{ estudiante.correo }}
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- PROYECTO -->
+      <div class="space-y-2">
+
+        <label class="text-sm font-semibold text-gray-700">
+          Proyecto
+        </label>
+
+        <select v-model="proyectoSeleccionado" :disabled="!estudianteSeleccionado"
+          class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:bg-gray-100">
+
+          <option value="">
+            Selecciona un proyecto
+          </option>
+
+          <option v-for="proyecto in proyectosEstudiante" :key="proyecto.id_proyecto" :value="proyecto.id_proyecto">
+            {{ proyecto.titulo }}
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- ARCHIVO OPCIONAL -->
+      <div class="space-y-2">
+
+        <label class="text-sm font-semibold text-gray-700">
+          Archivo adicional (Opcional)
+        </label>
+
+        <input type="file" @change="handleArchivoAdjunto" class="w-full border border-gray-300 p-2 rounded-xl" />
+
+      </div>
+
+      <!-- VIDEO OPCIONAL -->
+      <div class="space-y-2">
+
+        <label class="text-sm font-semibold text-gray-700">
+          Video (Opcional)
+        </label>
+
+        <input type="file" accept="video/*" @change="handleVideoAdjunto"
+          class="w-full border border-gray-300 p-2 rounded-xl" />
+
+      </div>
+
+      <!-- ENLACE OPCIONAL -->
+      <div class="space-y-2">
+
+        <label class="text-sm font-semibold text-gray-700">
+          Enlace (Opcional)
+        </label>
+
+        <input v-model="enlaceProyecto" type="text" placeholder="https://..."
+          class="w-full border border-gray-300 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400" />
+
+      </div>
+
+      <!-- BOTONES -->
+      <div class="flex justify-end gap-3 pt-2">
+
+        <button @click="showDestacarModal = false"
+          class="px-5 py-2 rounded-xl bg-gray-300 hover:bg-gray-400 transition">
+          Cancelar
+        </button>
+
+        <button @click="destacarProyecto"
+          class="px-5 py-2 rounded-xl bg-pink-500 text-white hover:scale-105 transition">
+          Destacar
+        </button>
+
+      </div>
+
     </div>
 
   </div>

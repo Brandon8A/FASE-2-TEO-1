@@ -10,10 +10,10 @@ export class UsuariosService {
     constructor(
         @InjectRepository(Usuario)
         private usuarioRepository: Repository<Usuario>,
-    ){}
+    ) { }
 
     //Metodo para crear usuarios en la base de datos
-    async crearUsuario(data: Partial<Usuario>){
+    async crearUsuario(data: Partial<Usuario>) {
         //Encriptar contraseña
         if (!data.contraseña) {
             throw new Error('La contraseña es obligatoria');
@@ -35,7 +35,7 @@ export class UsuariosService {
             where: {
                 eliminado: false
             },
-            relations: ['rol'] 
+            relations: ['rol']
         });
     }
 
@@ -57,10 +57,10 @@ export class UsuariosService {
         return await this.usuarioRepository.save(usuario);
     }
 
-    async eliminar(correo: string){
+    async eliminar(correo: string) {
         //Obtener usuario a eliminar
         const usuario = await this.usuarioRepository.findOne({
-            where: { correo: correo}
+            where: { correo: correo }
         })
 
         //Condicion que indica si el usuario a buscar existe o no
@@ -75,8 +75,8 @@ export class UsuariosService {
     }
 
     async actualizar(correo: string, data: any) {
-        const usuario = await this.usuarioRepository.findOne({ 
-            where: { correo } 
+        const usuario = await this.usuarioRepository.findOne({
+            where: { correo }
         });
 
         if (!usuario) {
@@ -91,5 +91,25 @@ export class UsuariosService {
         }
 
         return this.usuarioRepository.save(usuario);
+    }
+
+    // OBTENER SOLO ESTUDIANTES
+    async obtenerEstudiantes() {
+
+        const estudiantes = await this.usuarioRepository.find({
+            where: {
+                rol: {
+                    id_rol: 1
+                }
+            },
+            select: {
+                correo: true,
+                nombre: true,
+                rol: true
+            }
+        })
+
+        return estudiantes
+
     }
 }
