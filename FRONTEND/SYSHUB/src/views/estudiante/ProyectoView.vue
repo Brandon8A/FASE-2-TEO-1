@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const mostrarModal = ref(false)
@@ -12,6 +12,7 @@ const titulo = ref('')
 const descripcion = ref('')
 const etiquetas = ref('')
 const archivo = ref(null)
+const proyectos = ref([])
 
 const agregarTecnologia = () => {
     if (
@@ -39,20 +40,51 @@ const publicarProyecto = async () => {
 
     try {
 
+        const usuarioGuardado =
+            localStorage.getItem('usuario')
+
+        if (!usuarioGuardado) {
+
+            alert('Usuario no autenticado')
+            return
+        }
+
+        const usuario =
+            JSON.parse(usuarioGuardado)
+
         const formData = new FormData()
 
-        formData.append('titulo', titulo.value)
-        formData.append('descripcion', descripcion.value)
+        formData.append(
+            'titulo',
+            titulo.value
+        )
 
-        // ARRAY -> STRING
-        formData.append('stack', tecnologias.value.join(','))
+        formData.append(
+            'descripcion',
+            descripcion.value
+        )
 
-        formData.append('etiquetas', etiquetas.value)
+        formData.append(
+            'stack',
+            tecnologias.value.join(',')
+        )
 
-        formData.append('id_usuario_proyecto', localStorage.getItem('idUsuario'))
+        formData.append(
+            'etiquetas',
+            etiquetas.value
+        )
+
+        formData.append(
+            'id_usuario_proyecto',
+            usuario.correo
+        )
 
         if (archivo.value) {
-            formData.append('archivo', archivo.value)
+
+            formData.append(
+                'archivo',
+                archivo.value
+            )
         }
 
         const response = await axios.post(
@@ -60,14 +92,18 @@ const publicarProyecto = async () => {
             formData,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type':
+                        'multipart/form-data'
                 }
             }
         )
 
         console.log(response.data)
 
-        alert('Proyecto publicado correctamente')
+        alert('Proyecto publicado')
+
+        //Refrescando la vista de proyectos subidos
+        await obtenerProyectos()
 
         cerrarModal()
 
@@ -78,6 +114,39 @@ const publicarProyecto = async () => {
         alert('Error al publicar proyecto')
     }
 }
+
+const obtenerProyectos = async () => {
+
+    try {
+
+        const usuarioGuardado =
+            localStorage.getItem('usuario')
+
+        if (!usuarioGuardado) return
+
+        const usuario =
+            JSON.parse(usuarioGuardado)
+
+        const response = await axios.get(
+            `http://localhost:3000/proyecto/usuario/${usuario.correo}`
+        )
+
+        proyectos.value = response.data
+
+        console.log(proyectos.value)
+
+    } catch (error) {
+
+        console.error(
+            'Error obteniendo proyectos',
+            error
+        )
+    }
+}
+onMounted(() => {
+
+    obtenerProyectos()
+})
 </script>
 
 <template>
@@ -100,35 +169,97 @@ const publicarProyecto = async () => {
 
         <!-- GRID -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
             <!-- CARD -->
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="font-bold text-lg mb-2">
-                    Redes Neuronales
-                </h3>
-                <p class="text-sm text-gray-500">
-                    Proyecto de reconocimiento facial.
-                </p>
-            </div>
+            <div v-for="proyecto in proyectos" :key="proyecto.id_proyecto"
+                class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-2xl transition-all">
 
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="font-bold text-lg mb-2">
-                    Blockchain Académico
-                </h3>
-                <p class="text-sm text-gray-500">
-                    Validación de títulos.
-                </p>
-            </div>
+                <!-- HEADER -->
+                <div class="p-6 border-b border-gray-100">
 
-            <div class="bg-white p-6 rounded-xl shadow">
-                <h3 class="font-bold text-lg mb-2">
-                    IoT Agricultura
-                </h3>
-                <p class="text-sm text-gray-500">
-                    Sensores inteligentes.
-                </p>
-            </div>
+                    <div class="flex justify-between items-start gap-4">
 
+                        <div>
+                            <h3 class="font-extrabold text-xl text-[#3a5f94] mb-2">
+                                {{ proyecto.titulo }}
+                            </h3>
+
+                            <p class="text-sm text-gray-500 line-clamp-3">
+                                {{ proyecto.descripcion }}
+                            </p>
+                        </div>
+
+                        <span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-xs font-bold">
+                            #{{ proyecto.id_proyecto }}
+                        </span>
+
+                    </div>
+                </div>
+
+                <!-- STACK -->
+                <div class="p-6 space-y-5">
+
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-700 mb-3">
+                            Stack Tecnológico
+                        </h4>
+
+                        <div class="flex flex-wrap gap-2">
+
+                            <span v-for="tech in proyecto.stack.split(',')" :key="tech"
+                                class="bg-[#3a5f94] text-white text-xs px-3 py-1 rounded-full font-semibold">
+                                {{ tech }}
+                            </span>
+
+                        </div>
+                    </div>
+
+                    <!-- ETIQUETAS -->
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-700 mb-3">
+                            Etiquetas
+                        </h4>
+
+                        <div class="flex flex-wrap gap-2">
+
+                            <span v-for="tag in proyecto.etiquetas.split(',')" :key="tag"
+                                class="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full font-medium">
+                                {{ tag }}
+                            </span>
+
+                        </div>
+                    </div>
+
+                    <!-- ARCHIVO -->
+                    <div class="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
+
+                        <div class="flex items-center gap-3">
+
+                            <span class="material-symbols-outlined text-[#b50079]">
+                                description
+                            </span>
+
+                            <div>
+                                <p class="text-sm font-bold text-gray-700">
+                                    Archivo adjunto
+                                </p>
+
+                                <p class="text-xs text-gray-500">
+                                    {{ proyecto.path_archivo }}
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <a :href="`http://localhost:3000/uploads/${proyecto.path_archivo}`" target="_blank"
+                            class="bg-[#b50079] text-white px-4 py-2 rounded-lg text-sm font-bold hover:scale-105 transition">
+                            Ver
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
         </section>
 
     </div>
@@ -238,7 +369,7 @@ const publicarProyecto = async () => {
                                 Etiquetas de Búsqueda
                             </label>
 
-                            <input type="text" placeholder="IA, Machine Learning, Tesis..."
+                            <input v-model="etiquetas" type="text" placeholder="IA, Machine Learning, Tesis..."
                                 class="w-full rounded-xl bg-gray-100 border-none px-4 py-3 focus:ring-2 focus:ring-[#b50079] outline-none" />
                         </div>
                     </div>
@@ -272,10 +403,12 @@ const publicarProyecto = async () => {
                                 Soporta ZIP, PDF, MP4 o DOCX
                             </p>
 
-                            <button
-                                class="bg-[#b50079] text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition">
-                                Seleccionar Archivos
-                            </button>
+                            <input type="file" @change="seleccionarArchivo" class="hidden" id="archivoProyecto" />
+
+                            <label for="archivoProyecto"
+                                class="bg-[#b50079] text-white px-8 py-3 rounded-xl font-bold hover:scale-105 transition cursor-pointer inline-block">
+                                Seleccionar Archivo
+                            </label>
                         </div>
                     </div>
                 </section>

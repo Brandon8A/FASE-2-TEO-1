@@ -16,6 +16,8 @@ import { LikesModule } from './likes/likes.module';
 import { Likes } from './likes/entidades/likes.entity';
 import { ComentarioModule } from './comentario/comentario.module';
 import { Comentario } from './comentario/entidades/comentario.entity';
+import { ProyectoModule } from './proyecto/proyecto.module';
+import { Proyecto } from './proyecto/entidades/proyecto.entity';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { Comentario } from './comentario/entidades/comentario.entity';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario],
+      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario, Proyecto],
       synchronize: true,
       logging: true,
     }),
@@ -35,7 +37,8 @@ import { Comentario } from './comentario/entidades/comentario.entity';
     ContenidoModule,
     PublicacionModule,
     LikesModule,
-    ComentarioModule
+    ComentarioModule,
+    ProyectoModule
   ],
   controllers: [AppController],
   providers: [AppService],
