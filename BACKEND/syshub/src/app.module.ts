@@ -18,6 +18,8 @@ import { ComentarioModule } from './comentario/comentario.module';
 import { Comentario } from './comentario/entidades/comentario.entity';
 import { ProyectoModule } from './proyecto/proyecto.module';
 import { Proyecto } from './proyecto/entidades/proyecto.entity';
+import { DestacadoModule } from './destacado/destacado.module';
+import { Destacado } from './destacado/entidades/destacado.entity';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { Proyecto } from './proyecto/entidades/proyecto.entity';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario, Proyecto],
+      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario, Proyecto, Destacado],
       synchronize: true,
       logging: true,
     }),
@@ -38,7 +40,8 @@ import { Proyecto } from './proyecto/entidades/proyecto.entity';
     PublicacionModule,
     LikesModule,
     ComentarioModule,
-    ProyectoModule
+    ProyectoModule,
+    DestacadoModule
   ],
   controllers: [AppController],
   providers: [AppService],

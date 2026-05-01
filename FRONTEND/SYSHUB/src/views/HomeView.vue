@@ -37,12 +37,23 @@ const estudiantes = ref([])
 
 // LISTA DE PROYECTOS DEL ESTUDIANTE
 const proyectosEstudiante = ref([])
+//Constantes para destacar proyecto
+const archivoAdjunto = ref(null)
+const videoAdjunto = ref(null)
+const enlaceProyecto = ref('')
 
 // SELECCIONAR ALGUN ARCHIVO
 const handleFile = (e) => {
   archivo.value = e.target.files[0]
 }
 
+const handleArchivoAdjunto = (e) => {
+  archivoAdjunto.value = e.target.files[0]
+}
+
+const handleVideoAdjunto = (e) => {
+  videoAdjunto.value = e.target.files[0]
+}
 // OBTENER ESTUDIANTES
 const obtenerEstudiantes = async () => {
   try {
@@ -95,7 +106,7 @@ const destacarProyecto = async () => {
 
     const formData = new FormData()
 
-    formData.append('proyecto_fk', proyectoSeleccionado.value)
+    formData.append('proyecto_fk', Number(proyectoSeleccionado.value))
     formData.append('usuario_auxiliar_fk', user.value.correo)
 
     // ARCHIVO OPCIONAL
@@ -113,8 +124,9 @@ const destacarProyecto = async () => {
       formData.append('enlace', enlaceProyecto.value)
     }
 
+    console.log('Metodo destacarProyecto()')
     await axios.post(
-      'http://localhost:3000/destacar-proyecto',
+      'http://localhost:3000/proyecto/destacar',
       formData,
       {
         headers: {
@@ -125,7 +137,7 @@ const destacarProyecto = async () => {
 
     mostrarMensaje('Proyecto destacado correctamente')
 
-    // RESET
+    // RESETEAR FORM
     estudianteSeleccionado.value = ''
     proyectoSeleccionado.value = ''
     archivoAdjunto.value = null

@@ -6,9 +6,12 @@ import * as express from 'express';
 console.log("primer proyecto en nestjs...")
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   app.enableCors();//Activar cors para diferentes puertos
-  app.useGlobalPipes(new ValidationPipe());//Activar validaciones globales
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true
+  })
+  );//Activar validaciones globales
   app.use('/uploads', express.static('uploads'))
 
   await app.listen(process.env.PORT ?? 3000);
