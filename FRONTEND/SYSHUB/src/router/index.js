@@ -1,42 +1,57 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-//import DashboardView from '../views/DashboardView.vue'
-//import LoginView from '../views/LoginView.vue'
-//import HomeView from '../views/HomeView.vue'
-//import RegistroView from '../views/RegistroView.vue'
-
-//Funcion para saber si esta logueado
+// Función para saber si está logueado
 const estaAutenticado = () => {
   return !!localStorage.getItem('usuario')
 }
 
 const routes = [
+
+  // HOME PRINCIPAL
   {
     path: '/',
-    name: 'home',
-    component: () => import('../views/HomeView.vue')
+    component: () => import('../views/HomeView.vue'),
+
+    children: [
+      {
+        path: '',
+        redirect: '/feed'
+      },
+      {
+        path: 'feed',
+        component: () => import('../views/estudiante/FeedView.vue')
+      },
+      {
+        path: 'proyectos',
+        component: () => import('../views/estudiante/ProyectoView.vue')
+      }
+    ]
   },
+
+  // LOGIN
   {
     path: '/login',
     name: 'login',
     component: () => import('../views/LoginView.vue')
   },
+
+  // REGISTRO
   {
     path: '/registro',
     name: 'registro',
     component: () => import('../views/RegistroView.vue')
   },
 
-  // ADMIN LAYOUT
+  // ADMIN
   {
     path: '/homeAdmin',
     component: () => import('../views/AdminHomeView.vue'),
     meta: { requiresAuth: true },
-    
+
     children: [
       {
         path: '',
-        redirect: '/homeAdmin/usuarios' // vista por defecto
+        redirect: '/homeAdmin/usuarios'
       },
       {
         path: 'usuarios',
@@ -45,11 +60,7 @@ const routes = [
       {
         path: 'contenido',
         component: () => import('../views/admin/GestioContenidoView.vue')
-      }/*,
-      {
-        path: 'moderacion',
-        component: () => import('../views/admin/AdminModeracionView.vue')
-      }*/
+      }
     ]
   }
 ]
@@ -59,10 +70,12 @@ const router = createRouter({
   routes
 })
 
+// GUARD
 router.beforeEach((to) => {
+
   const logueado = estaAutenticado()
 
-  // Si requiere auth y NO está logueado
+  // Si requiere auth y no está logueado
   if (to.meta.requiresAuth && !logueado) {
     return '/login'
   }
@@ -72,7 +85,6 @@ router.beforeEach((to) => {
     return '/'
   }
 
-  // Permitir navegación
   return true
 })
 

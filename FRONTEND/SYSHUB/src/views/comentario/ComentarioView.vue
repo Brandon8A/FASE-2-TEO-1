@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import ComentarioView from './ComentarioView.vue' // 🔥 recursivo
+import ComentarioView from './ComentarioView.vue'
 
 const props = defineProps({
     comentario: Object,

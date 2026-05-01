@@ -1,5 +1,6 @@
 <script setup>
 import DashboardView from './views/DashboardView.vue'
+import ProyectoView from './views/estudiante/ProyectoView.vue';
 import HomeView from './views/HomeView.vue';
 import LoginView from './views/LoginView.vue';
 import RegistroView from './views/RegistroView.vue';
@@ -15,12 +16,10 @@ const isStudent = computed(() => {
 <template>
   <!--
   <DashboardView />
-  
-  
   <LoginView />
-  
   <RegistroView/>
   <HomeView />
+  <ProyectoView/>
   -->
   <router-view />
 </template>
