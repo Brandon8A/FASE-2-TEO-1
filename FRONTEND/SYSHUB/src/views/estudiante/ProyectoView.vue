@@ -1,11 +1,17 @@
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
 
 const mostrarModal = ref(false)
 
-const tecnologias = ref(['Python', 'TensorFlow', 'React'])
+const tecnologias = ref([])
 
 const nuevaTecnologia = ref('')
+
+const titulo = ref('')
+const descripcion = ref('')
+const etiquetas = ref('')
+const archivo = ref(null)
 
 const agregarTecnologia = () => {
     if (
@@ -25,8 +31,52 @@ const cerrarModal = () => {
     mostrarModal.value = false
 }
 
-const publicarProyecto = () => {
-    
+const seleccionarArchivo = (event) => {
+    archivo.value = event.target.files[0]
+}
+
+const publicarProyecto = async () => {
+
+    try {
+
+        const formData = new FormData()
+
+        formData.append('titulo', titulo.value)
+        formData.append('descripcion', descripcion.value)
+
+        // ARRAY -> STRING
+        formData.append('stack', tecnologias.value.join(','))
+
+        formData.append('etiquetas', etiquetas.value)
+
+        formData.append('id_usuario_proyecto', localStorage.getItem('idUsuario'))
+
+        if (archivo.value) {
+            formData.append('archivo', archivo.value)
+        }
+
+        const response = await axios.post(
+            'http://localhost:3000/proyecto',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        )
+
+        console.log(response.data)
+
+        alert('Proyecto publicado correctamente')
+
+        cerrarModal()
+
+    } catch (error) {
+
+        console.error(error)
+
+        alert('Error al publicar proyecto')
+    }
 }
 </script>
 
@@ -43,8 +93,7 @@ const publicarProyecto = () => {
                 Explora proyectos académicos.
             </p>
 
-            <button @click="mostrarModal = true" 
-            class="bg-pink-500 text-white px-6 py-2 rounded-lg">
+            <button @click="mostrarModal = true" class="bg-pink-500 text-white px-6 py-2 rounded-lg">
                 Publicar Proyecto
             </button>
         </section>
@@ -130,7 +179,7 @@ const publicarProyecto = () => {
                                 Título del Proyecto
                             </label>
 
-                            <input type="text" placeholder="Ej: Algoritmo de Optimización Cuántica"
+                            <input v-model="titulo" type="text" placeholder="Ej: Algoritmo de Optimización Cuántica"
                                 class="w-full rounded-xl bg-gray-100 border-none px-4 py-3 focus:ring-2 focus:ring-[#b50079] outline-none" />
                         </div>
 
@@ -139,8 +188,9 @@ const publicarProyecto = () => {
                                 Descripción del Proyecto
                             </label>
 
-                            <textarea rows="6" placeholder="Describe los objetivos, metodología y resultados..."
-                                class="w-full rounded-xl bg-gray-100 border-none px-4 py-3 focus:ring-2 focus:ring-[#b50079] outline-none resize-none"></textarea>
+                            <textarea v-model="descripcion" rows="6" placeholder="Describe los objetivos..."
+                                class="w-full rounded-xl bg-gray-100 border-none px-4 py-3 focus:ring-2 focus:ring-[#b50079] outline-none resize-none">
+                            </textarea>
                         </div>
                     </div>
                 </section>
