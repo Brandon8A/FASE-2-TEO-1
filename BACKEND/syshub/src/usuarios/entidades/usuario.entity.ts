@@ -2,27 +2,28 @@ import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from 
 import { Rol } from "./rol.entity";
 import { Comentario } from "src/comentario/entidades/comentario.entity";
 import { Proyecto } from "src/proyecto/entidades/proyecto.entity";
+import { BlogArticulo } from "src/blog-articulo/entidades/blog-articulo.entity";
 
 @Entity('USUARIO')
 export class Usuario {
-    
-    @PrimaryColumn({type: 'varchar', length: 75})
+
+    @PrimaryColumn({ type: 'varchar', length: 75 })
     correo!: string;
 
-    @Column({ type: 'varchar', length: 100})
+    @Column({ type: 'varchar', length: 100 })
     contraseña!: string;
 
-    @Column({ type: 'varchar', length: 75})
+    @Column({ type: 'varchar', length: 75 })
     nombre!: string;
 
-    @Column({ type: 'boolean', default: false})
+    @Column({ type: 'boolean', default: false })
     suspendido!: boolean;
 
-    @Column({ type: 'boolean', default: false})
+    @Column({ type: 'boolean', default: false })
     eliminado!: boolean;
 
     @ManyToOne(() => Rol, rol => rol.usuarios)
-    @JoinColumn({ name: 'rol'})
+    @JoinColumn({ name: 'rol' })
     rol!: Rol;
 
     @OneToMany(() => Comentario, (comentario) => comentario.usuario)
@@ -33,4 +34,10 @@ export class Usuario {
         proyecto => proyecto.usuario
     )
     proyectos?: Proyecto[];
+
+    @OneToMany(
+        () => BlogArticulo,
+        blog => blog.usuario
+    )
+    blogs?: BlogArticulo[];
 }

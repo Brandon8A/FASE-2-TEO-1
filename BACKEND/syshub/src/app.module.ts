@@ -20,6 +20,9 @@ import { ProyectoModule } from './proyecto/proyecto.module';
 import { Proyecto } from './proyecto/entidades/proyecto.entity';
 import { DestacadoModule } from './destacado/destacado.module';
 import { Destacado } from './destacado/entidades/destacado.entity';
+import { BlogArticuloModule } from './blog-articulo/blog-articulo.module';
+import { BlogArticulo } from './blog-articulo/entidades/blog-articulo.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -30,9 +33,15 @@ import { Destacado } from './destacado/entidades/destacado.entity';
       username: 'root',
       password: 'brandon031200',
       database: 'SYSHUB',
-      entities: [Usuario, Rol, Contenido, TipoContenido, Publicacion, Likes, Comentario, Proyecto, Destacado],
+      entities: [
+        Usuario, Rol, Contenido, TipoContenido, Publicacion,
+        Likes, Comentario, Proyecto, Destacado, BlogArticulo
+      ],
       synchronize: true,
       logging: true,
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true
     }),
     UsuariosModule,
     AuthModule,
@@ -41,7 +50,8 @@ import { Destacado } from './destacado/entidades/destacado.entity';
     LikesModule,
     ComentarioModule,
     ProyectoModule,
-    DestacadoModule
+    DestacadoModule,
+    BlogArticuloModule
   ],
   controllers: [AppController],
   providers: [AppService],

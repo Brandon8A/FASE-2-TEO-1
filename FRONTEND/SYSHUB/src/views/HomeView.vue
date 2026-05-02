@@ -124,7 +124,7 @@ const destacarProyecto = async () => {
       formData.append('enlace', enlaceProyecto.value)
     }
 
-    console.log('Metodo destacarProyecto()')
+    //console.log('Metodo destacarProyecto()')
     await axios.post(
       'http://localhost:3000/proyecto/destacar',
       formData,
@@ -147,6 +147,7 @@ const destacarProyecto = async () => {
     proyectosEstudiante.value = []
 
     showDestacarModal.value = false
+    alert('Proyecto destacado correctamente.')
 
   } catch (error) {
     console.error('Error al destacar proyecto', error)
@@ -213,18 +214,21 @@ const crearPublicacion = async () => {
       }
     )
 
-    console.log('Publicación creada:', response.data)
+    //console.log('Publicación creada:', response.data)
 
     // reset
     descripcion.value = ''
     archivo.value = null
     showModal.value = false
 
+    alert('Publicacion creada correctamente')
+
     //Recargar el feed
     recargarFeed.value++
 
   } catch (error) {
     console.error('Error al crear publicación', error)
+    alert('Hubo un error al crear la publicación')
   }
 
 }
@@ -249,11 +253,14 @@ const crearPregunta = async () => {
     pregunta.value = ''
     showPreguntaModal.value = false
 
+    alert('Pregunta creada correctamente')
+
     //Recargar el feed
     recargarFeed.value++
 
   } catch (error) {
     console.error('Error al crear pregunta', error)
+    alert('Error al crear pregunta')
   }
 }
 
@@ -318,13 +325,36 @@ const mostrarMensaje = (texto) => {
           <!-- INICIO -->
           <router-link to="/feed" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
             active-class="bg-pink-100 text-pink-600">
-            🏠 Inicio
+            <span class="material-symbols-outlined">home</span>
+            Inicio
+          </router-link>
+
+          <!-- BLOGS ARTICULOS -->
+          <router-link v-if="isAuxiliar" to="/blogsArticulos"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-white" active-class="bg-pink-100 text-pink-600">
+            <span class="material-symbols-outlined">article</span>
+            Blogs/Articulos
+          </router-link>
+
+          <!-- DESTACADOS -->
+          <router-link v-if="isAuxiliar" to="/destacados" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
+            active-class="bg-pink-100 text-pink-600">
+            <span class="material-symbols-outlined">star</span>
+            Destacados
+          </router-link>
+
+          <!-- PUBLICACIONES -->
+          <router-link to="/publicaciones" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
+            active-class="bg-pink-100 text-pink-600">
+            <span class="material-symbols-outlined">forum</span>
+            Publicaciones
           </router-link>
 
           <!-- PROYECTOS -->
           <router-link v-if="isStudent" to="/proyectos" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white"
             active-class="bg-pink-100 text-pink-600">
-            🚀 Proyectos
+            <span class="material-symbols-outlined">folder_code</span>
+            Proyectos
           </router-link>
 
         </nav>

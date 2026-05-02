@@ -14,6 +14,7 @@ export class ComentarioController {
         return this.comentarioService.crearComentario(dto)
     }
 
+    //Metodo para obtener los comentarios de una publicacion en especifico
     @Get('publicacion/:id')
     obtenerComentarios(@Param('id') id: number){
         console.log('Ingresando a controlador comentario, metodo Get() obtenerComentarios');

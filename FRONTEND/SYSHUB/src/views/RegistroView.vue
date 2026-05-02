@@ -13,18 +13,22 @@ const form = ref({
   contraseña: ''
 })
 
+//Metodo para registrar usuarios en el sistema
 const handleRegister = async () => {
   try {
-    console.log('Datos del formulario: ')
-    console.log(form.value)
+    //console.log('Datos del formulario: ')
+    //console.log(form.value)
     const response = await axios.post('http://localhost:3000/auth/register', form.value)
 
-    console.log('Respuesta backend:', response.data)
+    //console.log('Respuesta backend:', response.data)
+
+    alert('Usuario registrado correctamente');
 
     // Redirigir después de registrar
     router.push('/login')
 
   } catch (error) {
+    alert('Error al registrar usuario.')
     console.error('Error al registrar:', error.response?.data || error.message)
   }
 }

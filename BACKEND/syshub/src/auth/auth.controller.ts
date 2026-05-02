@@ -6,11 +6,12 @@ import { LoginDto } from './dto/login.dto/login.dto';
 //Controlador de autenticación
 @Controller('auth')
 export class AuthController {
-    
-    constructor(private authService: AuthService){
+
+    constructor(private authService: AuthService) {
 
     }
 
+    //Metodo post para registrar usuario
     @Post('register')
     async register(@Body() dto: CrearUsuarioDto) {
 
@@ -23,7 +24,7 @@ export class AuthController {
     }
 
     @Post('login')
-    async logueo(@Body() dto: LoginDto){
+    async logueo(@Body() dto: LoginDto) {
         console.log('DTO recibido: ', dto)
 
         const resultado = await this.authService.login(dto);
@@ -31,5 +32,19 @@ export class AuthController {
         console.log('Respuesta enviada: ', resultado)
 
         return resultado;
+    }
+
+    //Metodo post para recuperacion de contraseña
+    @Post('recuperar-password')
+    async recuperarPassword(@Body('correo') correo: string) {
+        return this.authService.recuperarPassword(correo)
+    }
+
+    //Metodo para restablecer contraseña
+    @Post('restablecer-password')
+    async restablecerPassword(
+        @Body() body: any
+    ) {
+        return this.authService.restablecerPassword(body)
     }
 }

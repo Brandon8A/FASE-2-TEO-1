@@ -105,9 +105,11 @@ const guardarUsuario = async () => {
       })
     }
 
+    alert('Usuario registrado con exito')
     showModal.value = false
 
   } catch (error) {
+    alert('Error al registrar nuevo usuario')
     console.error('Error al guardar:', error.response?.data || error.message)
   }
 }
@@ -119,8 +121,10 @@ const eliminar = async (correo) => {
   try {
     await axios.patch(`http://localhost:3000/usuarios/${correo}/eliminar`)
     usuarios.value = usuarios.value.filter(u => u.correo !== correo)
+    alert('Usuario eliminado correctamente')
   } catch (error) {
     console.error('Error al eliminar:', error.response?.data || error.message)
+    alert('Error al eliminar usuario')
   }
 }
 
@@ -135,7 +139,10 @@ const toggleEstado = async (user) => {
 
     user.estado = nuevoEstado ? 'Suspendido' : 'Activo'
 
+    alert('Usuario suspendido correctamente')
+
   } catch (error) {
+    alert('Error al suspender usuario')
     console.error('Error al cambiar estado:', error.response?.data || error.message)
   }
 }

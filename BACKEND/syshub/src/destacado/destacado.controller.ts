@@ -1,16 +1,7 @@
-import {
-    Body,
-    Controller,
-    Post,
-    UploadedFiles,
-    UseInterceptors
-} from '@nestjs/common';
-
+import {Body, Controller, Get, Param, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-
 import { DestacadoService } from './destacado.service';
 import { CrearDestacadoDto } from './dto/crear-destacado.dto/crear-destacado.dto';
 
@@ -21,31 +12,52 @@ export class DestacadoController {
         private readonly destacadoService: DestacadoService
     ) { }
 
+    //Metodo post que permite destacar proyectos
     @Post('destacar')
-    @UseInterceptors(FileFieldsInterceptor(
-        [
-            { name: 'archivo', maxCount: 1 },
-            { name: 'video', maxCount: 1 }
-        ],
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'archivo', maxCount: 1 },
+                { name: 'video', maxCount: 1 }
+            ],
+            {
+                storage: diskStorage({
 
-        {
-            storage: diskStorage({
-                destination: './uploads/destacados',
-                filename: (req, file, callback) => {
-                    const uniqueName =
-                        Date.now() +
-                        '-' +
-                        Math.round(Math.random() * 1e9) +
-                        extname(file.originalname);
+                    // DESTINO DINÁMICO
+                    destination: (req, file, callback) => {
 
-                    callback(null, uniqueName);
-                }
-            })
-        }
+                        // GUIAS / ARCHIVOS
+                        if (file.fieldname === 'archivo') {
+                            callback(
+                                null,
+                                './uploads/destacados/guias'
+                            )
+                        }
+
+                        // VIDEOS
+                        else if (file.fieldname === 'video') {
+                            callback(
+                                null,
+                                './uploads/destacados/videos'
+                            )
+                        }
+                    },
+
+                    // NOMBRE ARCHIVO
+                    filename: (req, file, callback) => {
+                        const uniqueName =
+                            Date.now() +
+                            '-' +
+                            Math.round(Math.random() * 1e9) +
+                            extname(file.originalname);
+                        callback(null, uniqueName);
+                    }
+                })
+            }
+        )
     )
-    )
-
     async destacarProyecto(
+
         @UploadedFiles()
         files: {
             archivo?: Express.Multer.File[],
@@ -54,10 +66,16 @@ export class DestacadoController {
         @Body()
         body: CrearDestacadoDto
     ) {
-        console.log('Entrando a controlador proyecto')
         return this.destacadoService.destacarProyecto(
             body,
             files
         );
     }
+
+    // OBTENER DESTACADOS POR AUXILIAR
+    @Get('destacados/:correo')
+    obtenerDestacadosAuxiliar(@Param('correo') correo: string) {
+        return this.destacadoService.obtenerDestacadosAuxiliar(correo)
+    }
+
 }

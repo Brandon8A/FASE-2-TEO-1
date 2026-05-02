@@ -11,37 +11,39 @@ export class PublicacionService {
   constructor(
     @InjectRepository(Publicacion)
     private publicacionRepository: Repository<Publicacion>,
-        
+
     @InjectRepository(Likes)
-    private likeRepository:Repository<Likes>,
+    private likeRepository: Repository<Likes>,
 
     private gateway: PublicacionGateway
-  ){}
+  ) { }
 
   //Metodo para crear publicacion en el sistema
-  async crearPublicacion(dto:CrearPublicacionDto, file: any) {
-      let rutaArchivo: string | undefined = undefined;
-      if (file) {
-          rutaArchivo = file.filename;
-      }
-      const nuevaPublicacion = this.publicacionRepository.create({
-          descripcion: dto.descripcion,
-          multimedia: file ? file.filename: null,
-          usuario: { correo: dto.usuario_publica_fk },
-          tipo: dto.tipo || 'POST'
-      } as any);
-      return await this.publicacionRepository.save(nuevaPublicacion);
+  async crearPublicacion(dto: CrearPublicacionDto, file: any) {
+    let rutaArchivo: string | undefined = undefined;
+    if (file) {
+      rutaArchivo = file.filename;
+    }
+    const nuevaPublicacion = this.publicacionRepository.create({
+      descripcion: dto.descripcion,
+      multimedia: file ? `${file.filename}`: null,
+      usuario: { correo: dto.usuario_publica_fk },
+      tipo: dto.tipo || 'POST'
+    } as any);
+    return await this.publicacionRepository.save(nuevaPublicacion);
   }
-  
+
   //Metodo para obtener todas las publicaciones registradas en la DB
-  async obtenerPublicaciones(){
-      return await this.publicacionRepository.find({
-          relations: ['usuario'],
-          order: {
-              fecha_publicacion: 'DESC'
-          }
-      })
+  async obtenerPublicaciones() {
+    return await this.publicacionRepository.find({
+      relations: ['usuario'],
+      order: {
+        fecha_publicacion: 'DESC'
+      }
+    })
   }
+
+  //Metodo para dar like o dislike a una publicacion
   async toggleLike(publicacionId: number, correo: string) {
 
     console.log('correo:', correo);
@@ -54,9 +56,9 @@ export class PublicacionService {
       },
       relations: ['usuario', 'publicacion']
     });
-  
+
     let liked = false;
-  
+
     if (existe) {
       //quitar like
       await this.likeRepository.remove(existe);
@@ -67,29 +69,49 @@ export class PublicacionService {
         usuario: { correo },
         publicacion: { id_publicacion: publicacionId }
       });
-    
+
       await this.likeRepository.save(nuevoLike);
       liked = true;
     }
-  
+
     // contar likes reales
     const totalLikes = await this.likeRepository.count({
       where: {
         publicacion: { id_publicacion: publicacionId }
       }
     });
-  
+
     // actualizar contador en PUBLICACION
     await this.publicacionRepository.update(publicacionId, {
       likes: totalLikes
     });
-  
+
     //emitir en tiempo real
     this.gateway.emitirLike(publicacionId, totalLikes);
-  
+
     return {
       liked,
       totalLikes
     };
+  }
+
+  //Metodo para obtener publicaciones desde la BD de un usuario
+  async obtenerPorUsuario(correo: string) {
+
+    return this.publicacionRepository.find({
+      where: {
+        usuario: {
+          correo: correo
+        }
+      },
+      relations: [
+        'usuario',
+        'comentarios',
+        'likesRelacion'
+      ],
+      order: {
+        id_publicacion: 'DESC'
+      }
+    })
   }
 }

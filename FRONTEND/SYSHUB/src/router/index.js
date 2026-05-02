@@ -11,19 +11,42 @@ const routes = [
   {
     path: '/',
     component: () => import('../views/HomeView.vue'),
+    meta: { requiresAuth: true },
 
     children: [
       {
         path: '',
         redirect: '/feed'
       },
+      //FEED
       {
         path: 'feed',
         component: () => import('../views/estudiante/FeedView.vue')
       },
+      //PROYECTOS
       {
         path: 'proyectos',
         component: () => import('../views/estudiante/ProyectoView.vue')
+      },
+      //DESTACADOS
+      {
+        path: 'destacados',
+        name: 'destacados',
+        component: () => import('../views/auxiliar/DestacadosView.vue')
+      },
+
+      // PUBLICACIONES
+      {
+        path: 'publicaciones',
+        name: 'publicaciones',
+        component: () => import('../views/auxiliar/PublicacionesView.vue')
+      },
+
+      //Blogs Articulos
+      {
+        path: 'blogsArticulos',
+        name: 'blogsArticulos',
+        component: () => import('../views/auxiliar/BlogsArticuloView.vue')
       }
     ]
   },
@@ -60,6 +83,10 @@ const routes = [
       {
         path: 'contenido',
         component: () => import('../views/admin/GestioContenidoView.vue')
+      },
+      {
+        path: 'moderacion',
+        component: () => import('../views/admin/GestionModeracionView.vue')
       }
     ]
   }

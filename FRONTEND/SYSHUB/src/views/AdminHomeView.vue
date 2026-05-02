@@ -9,7 +9,7 @@ const usuarios = ref([])
 const usuarioActual = JSON.parse(localStorage.getItem('usuario'))
 
 //Metodo para cerrar sesión y redirigir a pagina principal
-const logout = () =>{
+const logout = () => {
   localStorage.removeItem('usuario')
   router.push('/')
 }
@@ -107,11 +107,8 @@ const guardarUsuario = async () => {
           <p class="text-sm font-bold">{{ usuarioActual.correo }}</p>
         </div>
 
-        <img class="w-10 h-10 rounded-full" src="https://i.pravatar.cc/100"/>
-
         <!-- BOTÓN LOGOUT -->
-        <button @click="logout"
-          class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-600 transition">
+        <button @click="logout" class="bg-pink-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-600 transition">
           Cerrar sesión
         </button>
       </div>
@@ -123,23 +120,20 @@ const guardarUsuario = async () => {
       <aside class="hidden lg:flex flex-col w-64 p-6 gap-4">
 
         <!-- USUARIOS -->
-        <router-link to="/homeAdmin/usuarios"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+        <router-link to="/homeAdmin/usuarios" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">manage_accounts</span>
-            Usuarios
+          Usuarios
         </router-link>
 
         <!-- CONTENIDO -->
-        <router-link to="/homeAdmin/contenido"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+        <router-link to="/homeAdmin/contenido" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
           exact-active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">account_tree</span>
-            Contenido
+          Contenido
         </router-link>
 
-        <router-link to="/admin/moderacion"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
+        <router-link to="/homeAdmin/moderacion" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100"
           active-class="bg-pink-100 text-pink-600">
           <span class="material-symbols-outlined">gavel</span>
           Moderación
@@ -153,8 +147,7 @@ const guardarUsuario = async () => {
     </div>
 
     <!-- MODAL -->
-    <div v-if="showModal"
-      class="fixed inset-0 bg-black/40 flex items-center justify-center">
+    <div v-if="showModal" class="fixed inset-0 bg-black/40 flex items-center justify-center">
 
       <div class="bg-white p-6 rounded-xl w-[400px] space-y-4">
 
@@ -162,10 +155,10 @@ const guardarUsuario = async () => {
           {{ isEditing ? 'Editar Usuario' : 'Crear Usuario' }}
         </h3>
 
-        <input v-model="form.nombre" placeholder="Nombre" class="w-full border p-2 rounded"/>
-        <input v-model="form.correo" placeholder="Correo" class="w-full border p-2 rounded disabled:bg-gray-200 disabled:cursor-not-allowed"
-          :disabled="isEditing"/>
-        <input v-model="form.contraseña" type="password" placeholder="Contraseña" class="w-full border p-2 rounded"/>
+        <input v-model="form.nombre" placeholder="Nombre" class="w-full border p-2 rounded" />
+        <input v-model="form.correo" placeholder="Correo"
+          class="w-full border p-2 rounded disabled:bg-gray-200 disabled:cursor-not-allowed" :disabled="isEditing" />
+        <input v-model="form.contraseña" type="password" placeholder="Contraseña" class="w-full border p-2 rounded" />
 
         <select v-model="form.rol" class="w-full border p-2 rounded">
           <option>Estudiante</option>
@@ -174,13 +167,12 @@ const guardarUsuario = async () => {
         </select>
 
 
-        
+
 
 
         <div class="flex justify-end gap-2">
           <button @click="showModal = false">Cancelar</button>
-          <button @click="guardarUsuario"
-            class="bg-pink-600 text-white px-4 py-2 rounded">
+          <button @click="guardarUsuario" class="bg-pink-600 text-white px-4 py-2 rounded">
             Guardar
           </button>
         </div>

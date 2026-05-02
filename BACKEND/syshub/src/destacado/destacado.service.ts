@@ -47,11 +47,15 @@ export class DestacadoService {
 
             // ARCHIVO GENERAL
             path_guias:
-                files?.archivo?.[0]?.filename || null,
+                files?.archivo?.[0]
+                    ? `uploads/destacados/guias/${files.archivo[0].filename}`
+                    : null,
 
             // VIDEO
             path_grabaciones:
-                files?.video?.[0]?.filename || null,
+                files?.video?.[0]
+                    ? `uploads/destacados/videos/${files.video[0].filename}`
+                    : null,
 
             // ENLACE
             path_material:
@@ -63,4 +67,22 @@ export class DestacadoService {
 
     }
 
+    async obtenerDestacadosAuxiliar(correo: string) {
+
+        return this.destacadoRepository.find({
+            where: {
+                usuarioDestaca: {
+                    correo: correo
+                }
+            },
+            relations: [
+                'usuarioDestaca',
+                'proyecto',
+                'proyecto.usuario'
+            ],
+            order: {
+                id_curaduria: 'DESC'
+            }
+        })
+    }
 }
